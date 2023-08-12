@@ -2,4 +2,3 @@ go.mod
 go.sum
 .env
 database.yml
-README.md
