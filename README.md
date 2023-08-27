@@ -2,11 +2,9 @@
 
 `export PATH=$PATH:$(go env GOPATH)/bin`
 
-1. `$protoc --proto_path=api/proto api/proto/*.proto --go_out=. --go-grpc_out=. `
+inside /proto folder run command
 
-2. `$protoc --go_out=. --go_opt=paths=source_relative \                        
-    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-    api/proto/shorter.proto`
+`$ protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative *.proto`
 
 ## Run PostgreSQL in docker container:
 

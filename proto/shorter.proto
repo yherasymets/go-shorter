@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/yherasymets/go-shorter/proto";
+
+service Shorter {
+    rpc Create(UrlRequest) returns (UrlResponse){}
+    rpc Get(UrlRequest) returns (UrlResponse){}
+}
+
+message UrlRequest {
+    string fullURL = 1;
+}
+
+message UrlResponse {
+    string result = 1;
+    string status = 2;
+}
