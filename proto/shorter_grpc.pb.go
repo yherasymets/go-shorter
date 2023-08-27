@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v3.6.1
-// source: api/proto/shorter.proto
+// source: shorter.proto
 
 package proto
 
@@ -19,14 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Shorter_Short_FullMethodName = "/api.Shorter/Short"
+	Shorter_Create_FullMethodName = "/proto.Shorter/Create"
+	Shorter_Get_FullMethodName    = "/proto.Shorter/Get"
 )
 
 // ShorterClient is the client API for Shorter service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ShorterClient interface {
-	Short(ctx context.Context, in *UrlRequest, opts ...grpc.CallOption) (*UrlResponse, error)
+	Create(ctx context.Context, in *UrlRequest, opts ...grpc.CallOption) (*UrlResponse, error)
+	Get(ctx context.Context, in *UrlRequest, opts ...grpc.CallOption) (*UrlResponse, error)
 }
 
 type shorterClient struct {
@@ -37,9 +39,18 @@ func NewShorterClient(cc grpc.ClientConnInterface) ShorterClient {
 	return &shorterClient{cc}
 }
 
-func (c *shorterClient) Short(ctx context.Context, in *UrlRequest, opts ...grpc.CallOption) (*UrlResponse, error) {
+func (c *shorterClient) Create(ctx context.Context, in *UrlRequest, opts ...grpc.CallOption) (*UrlResponse, error) {
 	out := new(UrlResponse)
-	err := c.cc.Invoke(ctx, Shorter_Short_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Shorter_Create_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *shorterClient) Get(ctx context.Context, in *UrlRequest, opts ...grpc.CallOption) (*UrlResponse, error) {
+	out := new(UrlResponse)
+	err := c.cc.Invoke(ctx, Shorter_Get_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +61,8 @@ func (c *shorterClient) Short(ctx context.Context, in *UrlRequest, opts ...grpc.
 // All implementations must embed UnimplementedShorterServer
 // for forward compatibility
 type ShorterServer interface {
-	Short(context.Context, *UrlRequest) (*UrlResponse, error)
+	Create(context.Context, *UrlRequest) (*UrlResponse, error)
+	Get(context.Context, *UrlRequest) (*UrlResponse, error)
 	mustEmbedUnimplementedShorterServer()
 }
 
@@ -58,8 +70,11 @@ type ShorterServer interface {
 type UnimplementedShorterServer struct {
 }
 
-func (UnimplementedShorterServer) Short(context.Context, *UrlRequest) (*UrlResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Short not implemented")
+func (UnimplementedShorterServer) Create(context.Context, *UrlRequest) (*UrlResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (UnimplementedShorterServer) Get(context.Context, *UrlRequest) (*UrlResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedShorterServer) mustEmbedUnimplementedShorterServer() {}
 
@@ -74,20 +89,38 @@ func RegisterShorterServer(s grpc.ServiceRegistrar, srv ShorterServer) {
 	s.RegisterService(&Shorter_ServiceDesc, srv)
 }
 
-func _Shorter_Short_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Shorter_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UrlRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ShorterServer).Short(ctx, in)
+		return srv.(ShorterServer).Create(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Shorter_Short_FullMethodName,
+		FullMethod: Shorter_Create_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ShorterServer).Short(ctx, req.(*UrlRequest))
+		return srv.(ShorterServer).Create(ctx, req.(*UrlRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Shorter_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UrlRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShorterServer).Get(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Shorter_Get_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShorterServer).Get(ctx, req.(*UrlRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -96,14 +129,18 @@ func _Shorter_Short_Handler(srv interface{}, ctx context.Context, dec func(inter
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Shorter_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.Shorter",
+	ServiceName: "proto.Shorter",
 	HandlerType: (*ShorterServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Short",
-			Handler:    _Shorter_Short_Handler,
+			MethodName: "Create",
+			Handler:    _Shorter_Create_Handler,
+		},
+		{
+			MethodName: "Get",
+			Handler:    _Shorter_Get_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/proto/shorter.proto",
+	Metadata: "shorter.proto",
 }

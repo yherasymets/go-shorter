@@ -7,66 +7,82 @@ import (
 	"time"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/yherasymets/go-shorter/api/proto"
-	"github.com/yherasymets/go-shorter/db"
+	"github.com/yherasymets/go-shorter/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 )
-
-// GRPCServer...
-type GRPCServer struct {
-	proto.UnimplementedShorterServer
-}
 
 const (
-	alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	alphabet   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	charNumber = 5
+
+	statusExist    = "link already exist"
+	statusSuccsess = "succsess"
 )
 
-func shorting() string {
-	b := make([]byte, 5)
-	for i := range b {
-		b[i] = alphabet[rand.Intn(len(alphabet))]
-	}
-	return string(b)
+type GRPCServer struct {
+	proto.UnimplementedShorterServer
+	DB *gorm.DB
 }
 
-// TODO add case without http(s)
-
-// func isValidUrl(token string) bool {
-// 	_, err := url.ParseRequestURI(token)
-// 	if err != nil {
-// 		return false
-// 	}
-// 	u, err := url.Parse(token)
-// 	if err != nil || u.Host == "" {
-// 		return false
-// 	}
-
-// 	if u[:5] == ""
-
-// 	return true
-// }
-
-func validateURL(u string) error {
-	valid := govalidator.IsRequestURL(u)
-	if !valid {
-		return status.Error(codes.InvalidArgument, "invalid url")
-	}
-	return nil
-}
-
-func (GRPCServer) Short(ctx context.Context, req *proto.UrlRequest) (*proto.UrlResponse, error) {
-	var link Link
-	db := db.Conn()
-	token := shorting()
-	if err := validateURL(req.UrlName); err != nil {
+func (g *GRPCServer) Create(ctx context.Context, req *proto.UrlRequest) (*proto.UrlResponse, error) {
+	link := Link{}
+	alias := shorting()
+	if err := validateURL(req.FullURL); err != nil {
 		return nil, err
 	}
-	link.FullLink = req.UrlName
-	link.Alias = token
+
+	g.DB.Table("links").Where("full_link = ?", req.FullURL).Find(&link)
+	if req.FullURL == link.FullLink {
+		return &proto.UrlResponse{
+			Result: fmt.Sprintf("localhost:8081/%s", link.Alias),
+			Status: statusExist,
+		}, nil
+	}
+
+	link.FullLink = req.FullURL
+	link.Alias = alias
 	link.CreatedAt = time.Now()
-	db.Create(&link)
+	g.DB.Create(&link)
+
 	return &proto.UrlResponse{
-		UrlResult: fmt.Sprintf("localhost:8081/%s", token),
+		Result: fmt.Sprintf("localhost:8081/%s", link.Alias),
+		Status: statusSuccsess,
 	}, nil
+}
+
+func (g *GRPCServer) Get(ctx context.Context, req *proto.UrlRequest) (*proto.UrlResponse, error) {
+	var link Link
+
+	if req.FullURL == "" {
+		return nil, status.Error(codes.InvalidArgument, "url must be set")
+	}
+
+	g.DB.Table("links").Where("alias = ?", req.FullURL[len(req.FullURL)-charNumber:]).Find(&link)
+	return &proto.UrlResponse{
+		Result: link.FullLink,
+		Status: statusSuccsess,
+	}, nil
+}
+
+func shorting() string {
+	alias := make([]byte, charNumber)
+	for i := range alias {
+		alias[i] = alphabet[rand.Intn(len(alphabet))]
+	}
+	return string(alias)
+}
+
+func validateURL(url string) error {
+	if url == "" {
+		return status.Error(codes.InvalidArgument, "empty url")
+	}
+	if url[:4] == "http" || url[:5] == "https" {
+		valid := govalidator.IsRequestURL(url)
+		if !valid {
+			return status.Error(codes.InvalidArgument, "invalid url")
+		}
+	}
+	return nil
 }
