@@ -1,29 +1,30 @@
 package main
 
 import (
-	"log"
 	"net"
 	"os"
 
-	"github.com/yherasymets/go-shorter/databases"
+	"github.com/sirupsen/logrus"
 	"github.com/yherasymets/go-shorter/pkg/shorter"
 	"github.com/yherasymets/go-shorter/proto"
+	"github.com/yherasymets/go-shorter/repo"
 	"google.golang.org/grpc"
 )
 
 func main() {
 	l, err := net.Listen("tcp", os.Getenv("GRPC_PORT"))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logrus.Errorf("failed to listen: %v", err)
+		return
 	}
-	db := databases.Conn()
+
+	db := repo.Conn()
 	s := grpc.NewServer()
-	srv := &shorter.GRPCServer{
-		DB: db,
-	}
+	srv := &shorter.GRPCServer{DB: db}
 	proto.RegisterShorterServer(s, srv)
-	log.Printf("Starting gRPC listener on port " + os.Getenv("GRPC_PORT"))
+
+	logrus.Infof("Starting gRPC listener on port " + os.Getenv("GRPC_PORT"))
 	if err := s.Serve(l); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 }

@@ -1,6 +1,6 @@
-## How to generate proto file:
-
 `export PATH=$PATH:$(go env GOPATH)/bin`
+
+## How to generate proto file:
 
 inside /proto folder run command
 

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #73b0e9;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #bfe5a5;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 620px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #410777;
+            margin-bottom: 20px;
+        }
+
+        label, p {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #shortened-link {
+            margin-top: 20px;
+        }
+
+        #shortened-link a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>URL Shortener</h1>
+        <form id="shorten-form" method="POST" action="/go-shorter" class="needs-validation">
+            <label for="original-link">Enter or paste your long URL:</label>
+            <input type="text" id="original-link" name="original-link" placeholder="https://www.example.com" required>
+            <button type="submit">Shorten</button>
+        </form>
+        <div id="shortened-link"></div>
+        {{ if .Result }}
+        <p>Shortened URL:</p>
+        <div class="alert alert-success" role="alert" id="url"></div>
+        <script>
+            var resultUrl = '{{ .Result }}'; 
+            document.getElementById("url").innerHTML = '<a href="' + resultUrl + '" target="_blank" style="color: red;" class="copy-link">' + resultUrl + '</a>';
+            document.getElementById("url").insertAdjacentHTML("afterend", '<div style="margin-top: 20px;"><button class="btn" id="button" onclick="copyUrl();"><i class="fa fa-copy"></i>Copy</button></div>');
+        
+            function copyUrl() {
+                var urlElement = document.querySelector('.copy-link'); 
+                var range = document.createRange();
+                range.selectNode(urlElement);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+        
+                try {
+                    var successful = document.execCommand('copy');
+                    var msg = successful ? 'Скопійовано!' : 'Помилка копіювання';
+                    console.log(msg);
+                } catch (err) {
+                    console.error('Помилка копіювання: ', err);
+                }
+        
+                window.getSelection().removeAllRanges();
+                document.getElementById("button").innerText = "Copied!";
+            }
+        </script>           
+    {{ end }}
+    </div>
+</body>
+</html>
