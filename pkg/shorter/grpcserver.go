@@ -36,7 +36,7 @@ func (g *GRPCServer) Create(ctx context.Context, req *proto.UrlRequest) (*proto.
 	g.DB.Table("links").Where("full_link = ?", req.FullURL).Find(&link)
 	if req.FullURL == link.FullLink {
 		return &proto.UrlResponse{
-			Result: fmt.Sprintf("localhost:8081/%s", link.Alias),
+			Result: fmt.Sprintf("localhost:8080/%s", link.Alias),
 			Status: statusExist,
 		}, nil
 	}
@@ -47,7 +47,7 @@ func (g *GRPCServer) Create(ctx context.Context, req *proto.UrlRequest) (*proto.
 	g.DB.Create(&link)
 
 	return &proto.UrlResponse{
-		Result: fmt.Sprintf("localhost:8081/%s", link.Alias),
+		Result: fmt.Sprintf("localhost:8080/%s", link.Alias),
 		Status: statusSuccsess,
 	}, nil
 }
@@ -59,7 +59,8 @@ func (g *GRPCServer) Get(ctx context.Context, req *proto.UrlRequest) (*proto.Url
 		return nil, status.Error(codes.InvalidArgument, "url must be set")
 	}
 
-	g.DB.Table("links").Where("alias = ?", req.FullURL[len(req.FullURL)-charNumber:]).Find(&link)
+	alias := req.FullURL[len(req.FullURL)-charNumber:]
+	g.DB.Table("links").Where("alias = ?", alias).Find(&link)
 	return &proto.UrlResponse{
 		Result: link.FullLink,
 		Status: statusSuccsess,
@@ -78,11 +79,8 @@ func validateURL(url string) error {
 	if url == "" {
 		return status.Error(codes.InvalidArgument, "empty url")
 	}
-	if url[:4] == "http" || url[:5] == "https" {
-		valid := govalidator.IsRequestURL(url)
-		if !valid {
-			return status.Error(codes.InvalidArgument, "invalid url")
-		}
+	if !govalidator.IsRequestURL(url) {
+		return status.Error(codes.InvalidArgument, "invalid url")
 	}
 	return nil
 }
