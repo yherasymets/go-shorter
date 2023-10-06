@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net"
 	"os"
 
@@ -19,8 +20,14 @@ func main() {
 	}
 
 	db := repo.Conn()
+	cache := repo.RedisClient()
+
+	logrus.Infof("starting redis client: %v", cache.Ping(context.Background()).Val())
+
+	defer cache.Close()
+
 	s := grpc.NewServer()
-	srv := &shorter.GRPCServer{DB: db}
+	srv := &shorter.GRPCServer{DB: db, Cache: cache}
 	proto.RegisterShorterServer(s, srv)
 
 	logrus.Infof("Starting gRPC listener on port " + os.Getenv("GRPC_PORT"))
