@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/go-redis/redis/v8"
+	"github.com/sirupsen/logrus"
 	"github.com/yherasymets/go-shorter/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,7 +25,8 @@ const (
 
 type GRPCServer struct {
 	proto.UnimplementedShorterServer
-	DB *gorm.DB
+	DB    *gorm.DB
+	Cache *redis.Client
 }
 
 func (g *GRPCServer) Create(ctx context.Context, req *proto.UrlRequest) (*proto.UrlResponse, error) {
@@ -53,14 +56,23 @@ func (g *GRPCServer) Create(ctx context.Context, req *proto.UrlRequest) (*proto.
 }
 
 func (g *GRPCServer) Get(ctx context.Context, req *proto.UrlRequest) (*proto.UrlResponse, error) {
-	var link Link
-
+	link := Link{}
 	if req.FullURL == "" {
 		return nil, status.Error(codes.InvalidArgument, "url must be set")
 	}
-
 	alias := req.FullURL[len(req.FullURL)-charNumber:]
-	g.DB.Table("links").Where("alias = ?", alias).Find(&link)
+	res, err := g.Cache.Get(ctx, alias).Result()
+	if err == nil {
+		link.FullLink = res
+		logrus.Info("retrive from cache")
+	} else {
+		g.DB.Table("links").Where("alias = ?", alias).Find(&link)
+		logrus.Info("retrive from DB")
+		err := g.Cache.Set(ctx, alias, link.FullLink, time.Hour).Err()
+		if err != nil {
+			logrus.Error(err)
+		}
+	}
 	return &proto.UrlResponse{
 		Result: link.FullLink,
 		Status: statusSuccsess,

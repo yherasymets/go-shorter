@@ -30,6 +30,7 @@ func (app *ClientApp) Create(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseGlob("frontend/index.html")
 	service := proto.NewShorterClient(app.Conn)
 	if r.Method == http.MethodPost {
+		w.WriteHeader(200)
 		res, err := service.Create(r.Context(), &proto.UrlRequest{
 			FullURL: r.PostFormValue("original-link"),
 		})

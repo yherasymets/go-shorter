@@ -20,7 +20,9 @@ func main() {
 		Conn: conn,
 	}
 
+	logrus.Info("starting client..")
 	if err = http.ListenAndServe(":8080", client.Routes()); err != nil {
 		logrus.Fatalf("failed to connect :8080 %v", err)
 	}
+
 }
