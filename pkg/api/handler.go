@@ -2,9 +2,9 @@ package api
 
 import (
 	"context"
-	"html/template"
 	"net/http"
 	"regexp"
+	"text/template"
 
 	"github.com/sirupsen/logrus"
 	"github.com/yherasymets/go-shorter/proto"
@@ -13,35 +13,49 @@ import (
 
 // App struct
 type ClientApp struct {
-	HTMLDir   string
-	StaticDir string
-	Conn      *grpc.ClientConn
+	Conn *grpc.ClientConn
 }
 
-func (app *ClientApp) Routes() http.Handler {
+func (app *ClientApp) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", app.Get)
 	mux.HandleFunc("/go-shorter", app.Create)
 	return mux
-
 }
 
 func (app *ClientApp) Create(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseGlob("frontend/index.html")
+	t, err := template.ParseFiles("frontend/index.html")
+	if err != nil {
+		logrus.Errorf("Failed to parse template: %v", err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
 	service := proto.NewShorterClient(app.Conn)
-	if r.Method == http.MethodPost {
-		w.WriteHeader(200)
+	switch r.Method {
+	case http.MethodGet:
+		w.Header().Set("Content-Type", "text/html")
+		if err := t.ExecuteTemplate(w, "index.html", nil); err != nil {
+			logrus.Errorf("Failed to execute template: %v", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+		}
+	case http.MethodPost:
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "text/html")
 		res, err := service.Create(r.Context(), &proto.UrlRequest{
 			FullURL: r.PostFormValue("original-link"),
 		})
 		if err != nil {
-			logrus.Infof("%v", err)
+			logrus.Errorf("Failed to create URL: %v", err)
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+		if err := t.ExecuteTemplate(w, "index.html", res); err != nil {
+			logrus.Errorf("Failed to execute template: %v", err)
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 		}
-		t.ExecuteTemplate(w, "index.html", res)
-		return
+	default:
+		http.NotFound(w, r)
 	}
-	t.ExecuteTemplate(w, "index.html", nil)
 }
 
 func (app *ClientApp) Get(w http.ResponseWriter, r *http.Request) {
