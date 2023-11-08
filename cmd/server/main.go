@@ -12,26 +12,28 @@ import (
 	"google.golang.org/grpc"
 )
 
+var gRPCport = os.Getenv("GRPC_PORT")
+
 func main() {
-	l, err := net.Listen("tcp", os.Getenv("GRPC_PORT"))
+	l, err := net.Listen("tcp", gRPCport)
 	if err != nil {
 		logrus.Errorf("failed to listen: %v", err)
 		return
 	}
-
 	db := repo.Conn()
 	cache := repo.RedisClient()
-
+	defer cache.Close()
 	logrus.Infof("starting redis client: %v", cache.Ping(context.Background()).Val())
 
-	defer cache.Close()
+	service := grpc.NewServer()
+	server := &shorter.GRPCServer{
+		DB:    db,
+		Cache: cache,
+	}
+	proto.RegisterShorterServer(service, server)
 
-	s := grpc.NewServer()
-	srv := &shorter.GRPCServer{DB: db, Cache: cache}
-	proto.RegisterShorterServer(s, srv)
-
-	logrus.Infof("Starting gRPC listener on port " + os.Getenv("GRPC_PORT"))
-	if err := s.Serve(l); err != nil {
+	logrus.Infof("starting gRPC listener on port " + gRPCport)
+	if err := service.Serve(l); err != nil {
 		logrus.Fatal(err)
 	}
 }

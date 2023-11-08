@@ -18,47 +18,36 @@ type ClientApp struct {
 
 func (app *ClientApp) Handler() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", app.Get)
-	mux.HandleFunc("/go-shorter", app.Create)
+	mux.HandleFunc("/", app.get)
+	mux.HandleFunc("/go-shorter", app.create)
+	mux.HandleFunc("/go-shorter/result", app.result)
 	return mux
 }
 
-func (app *ClientApp) Create(w http.ResponseWriter, r *http.Request) {
+// TODO: error handling, logging
+
+func (app *ClientApp) create(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("frontend/index.html")
 	if err != nil {
-		logrus.Errorf("Failed to parse template: %v", err)
+		logrus.Errorf("failed to parse template: %v", err)
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
-	service := proto.NewShorterClient(app.Conn)
+	w.Header().Set("Content-Type", "text/html")
 	switch r.Method {
 	case http.MethodGet:
-		w.Header().Set("Content-Type", "text/html")
 		if err := t.ExecuteTemplate(w, "index.html", nil); err != nil {
-			logrus.Errorf("Failed to execute template: %v", err)
+			logrus.Errorf("failed to execute template: %v", err)
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 		}
 	case http.MethodPost:
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Content-Type", "text/html")
-		res, err := service.Create(r.Context(), &proto.UrlRequest{
-			FullURL: r.PostFormValue("original-link"),
-		})
-		if err != nil {
-			logrus.Errorf("Failed to create URL: %v", err)
-			http.Error(w, "internal server error", http.StatusInternalServerError)
-			return
-		}
-		if err := t.ExecuteTemplate(w, "index.html", res); err != nil {
-			logrus.Errorf("Failed to execute template: %v", err)
-			http.Error(w, "internal server error", http.StatusInternalServerError)
-		}
+		http.Redirect(w, r, "/go-shorter/result", http.StatusPermanentRedirect)
 	default:
 		http.NotFound(w, r)
 	}
 }
 
-func (app *ClientApp) Get(w http.ResponseWriter, r *http.Request) {
+func (app *ClientApp) get(w http.ResponseWriter, r *http.Request) {
 	service := proto.NewShorterClient(app.Conn)
 	// Extract the part of the URL after the slash ("/")
 	path := r.URL.Path[1:]
@@ -76,10 +65,32 @@ func (app *ClientApp) Get(w http.ResponseWriter, r *http.Request) {
 			FullURL: path,
 		})
 		if err != nil {
-			logrus.Infof("%v", err)
+			logrus.Info(err)
 		}
 		http.Redirect(w, r, resp.Result, http.StatusMovedPermanently)
 		return
 	}
 	http.NotFound(w, r)
+}
+
+func (app *ClientApp) result(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("frontend/result.html")
+	if err != nil {
+		logrus.Errorf("failed to parse template: %v", err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+	service := proto.NewShorterClient(app.Conn)
+	res, err := service.Create(r.Context(), &proto.UrlRequest{
+		FullURL: r.PostFormValue("original-link"),
+	})
+	if err != nil {
+		logrus.Errorf("failed to create URL: %v", err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+	if err := t.ExecuteTemplate(w, "result.html", res); err != nil {
+		logrus.Errorf("failed to execute template: %v", err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+	}
 }
