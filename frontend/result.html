@@ -21,6 +21,8 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 30px;
+            padding-top: 13px;
+            width: 620px;
             text-align: center;
             max-width: 620px;
             width: 100%;
@@ -35,7 +37,7 @@
         label, p {
             font-weight: bold;
             display: block;
-            margin-bottom: 8px;
+            margin: 10px;
         }
 
         input[type="text"] {
@@ -80,18 +82,39 @@
         }
     </style>
 </head>
-    <body>
-        <div class="container">
-            <h1>URL Shortener</h1>
-            <form id="shorten-form" method="POST" action="/go-shorter" class="needs-validation">
-                <label for="original-link"><i>Enter or paste your long URL:</i></label>
-                <input type="text" id="original-link" name="original-link" placeholder="https://www.example.com" required>
-                <button type="submit">Shorten</button>
-            </form>
-            <!-- <div id="shortened-link"></div> -->
-        </div>
-        <footer>
-            &copy; <span id="currentYear"></span> GO-SHORTER &#127482;&#127462;
-        </footer>
-    </body>
+<body>
+    <div class="container">
+        <!-- <h1>Result</h1> -->
+        <div id="shortened-link"></div>
+        <a href="/go-shorter">Create another one</a>
+        {{ if .Result }}
+        <label><i>Shortened URL:</i></label>
+        <div class="alert alert-success" role="alert" id="url"></div>
+        <script>
+            var resultUrl = '{{ .Result }}'; 
+            document.getElementById("url").innerHTML = '<a href="' + resultUrl + '" target="_blank" style="color: red;" class="copy-link">' + resultUrl + '</a>';
+            document.getElementById("url").insertAdjacentHTML("afterend", '<div style="margin-top: 20px;"><button class="btn" id="button" onclick="copyUrl();"><i class="fa fa-copy"></i>Copy</button></div>');       
+            function copyUrl() {
+                var urlElement = document.querySelector('.copy-link'); 
+                var range = document.createRange();
+                range.selectNode(urlElement);
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);       
+                try {
+                    var successful = document.execCommand('copy');
+                    var msg = successful ? 'Скопійовано!' : 'Помилка копіювання';
+                    console.log(msg);
+                } catch (err) {
+                    console.error('Помилка копіювання: ', err);
+                }      
+                window.getSelection().removeAllRanges();
+                document.getElementById("button").innerText = "Copied!";
+            }
+        </script>           
+    {{ end }}
+    </div>
+    <footer>
+        &copy; <span id="currentYear"></span> GO-SHORTER &#127482;&#127462;
+    </footer>
+</body>
 </html>

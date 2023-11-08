@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/sirupsen/logrus"
+	"github.com/yherasymets/go-shorter/pkg/shorter"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var (
@@ -18,14 +19,13 @@ var (
 )
 
 func Conn() *gorm.DB {
-	logger := logger.Default
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-
-	db, err := gorm.Open(postgres.Open(psqlInfo), &gorm.Config{
-		Logger: logger,
-	})
+	db, err := gorm.Open(postgres.Open(psqlInfo), &gorm.Config{})
 	if err != nil {
-		panic(err)
+		panic("failed to connect database")
+	}
+	if err := db.AutoMigrate(shorter.Link{}); err != nil {
+		logrus.Errorf("migration failed: %v", err)
 	}
 	return db
 }

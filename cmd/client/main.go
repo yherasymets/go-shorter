@@ -10,17 +10,22 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+var (
+	gRPCport  = os.Getenv("GRPC_PORT")
+	localPort = os.Getenv("PORT")
+)
+
 func main() {
-	conn, err := grpc.Dial(os.Getenv("GRPC_PORT"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(gRPCport, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logrus.Fatalf("failed to connect :8081 %v", err)
+		logrus.Fatalf("failed to connect %v", err)
 	}
 
 	client := api.ClientApp{Conn: conn}
 	handler := client.Handler()
-	logrus.Info("starting client..")
 
-	if err = http.ListenAndServe(":8080", handler); err != nil {
-		logrus.Fatalf("failed to connect :8080 %v", err)
+	logrus.Info("starting client on port ", localPort)
+	if err = http.ListenAndServe(localPort, handler); err != nil {
+		logrus.Fatalf("failed to connect %v: %v", localPort, err)
 	}
 }
