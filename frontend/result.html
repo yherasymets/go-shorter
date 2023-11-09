@@ -21,8 +21,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 30px;
-            padding-top: 13px;
-            width: 620px;
+            height: 192.078px;
             text-align: center;
             max-width: 620px;
             width: 100%;
@@ -32,6 +31,10 @@
             font-size: 24px;
             color: #410777;
             margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 20px;
         }
 
         label, p {
@@ -50,7 +53,7 @@
         }
 
         button {
-            background-color: #007BFF;
+            background-color: #05213f;
             color: #fff;
             border: none;
             padding: 12px 20px;
@@ -61,7 +64,7 @@
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #05213f;
         }
 
         #shortened-link {
@@ -84,15 +87,14 @@
 </head>
 <body>
     <div class="container">
-        <!-- <h1>Result</h1> -->
         <div id="shortened-link"></div>
-        <a href="/go-shorter">Create another one</a>
+        <h3><a href="/go-shorter">Create another one</a></h3>
         {{ if .Result }}
         <label><i>Shortened URL:</i></label>
         <div class="alert alert-success" role="alert" id="url"></div>
         <script>
             var resultUrl = '{{ .Result }}'; 
-            document.getElementById("url").innerHTML = '<a href="' + resultUrl + '" target="_blank" style="color: red;" class="copy-link">' + resultUrl + '</a>';
+            document.getElementById("url").innerHTML = '<a href="http://' + resultUrl + '" target="_blank" style="color: red;" class="copy-link">' + resultUrl + '</a>';
             document.getElementById("url").insertAdjacentHTML("afterend", '<div style="margin-top: 20px;"><button class="btn" id="button" onclick="copyUrl();"><i class="fa fa-copy"></i>Copy</button></div>');       
             function copyUrl() {
                 var urlElement = document.querySelector('.copy-link'); 
