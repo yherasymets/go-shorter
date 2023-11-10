@@ -3,12 +3,11 @@ package shorter
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"time"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
+	"github.com/yherasymets/go-shorter/pkg/utils"
 	"github.com/yherasymets/go-shorter/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -16,9 +15,7 @@ import (
 )
 
 const (
-	alphabet   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	charNumber = 5
-
+	charNumber     = 5
 	statusExist    = "link already exist"
 	statusSuccsess = "succsess"
 )
@@ -31,8 +28,8 @@ type GRPCServer struct {
 
 func (g *GRPCServer) Create(ctx context.Context, req *proto.UrlRequest) (*proto.UrlResponse, error) {
 	link := Link{}
-	alias := shorting()
-	if err := validateURL(req.FullURL); err != nil {
+	alias := utils.Shorting()
+	if err := utils.ValidateURL(req.FullURL); err != nil {
 		return nil, err
 	}
 
@@ -77,22 +74,4 @@ func (g *GRPCServer) Get(ctx context.Context, req *proto.UrlRequest) (*proto.Url
 		Result: link.FullLink,
 		Status: statusSuccsess,
 	}, nil
-}
-
-func shorting() string {
-	alias := make([]byte, charNumber)
-	for i := range alias {
-		alias[i] = alphabet[rand.Intn(len(alphabet))]
-	}
-	return string(alias)
-}
-
-func validateURL(url string) error {
-	if url == "" {
-		return status.Error(codes.InvalidArgument, "empty url")
-	}
-	if !govalidator.IsRequestURL(url) {
-		return status.Error(codes.InvalidArgument, "invalid url")
-	}
-	return nil
 }

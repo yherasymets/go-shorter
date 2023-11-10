@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/sirupsen/logrus"
-	"github.com/yherasymets/go-shorter/pkg/shorter"
+	"github.com/yherasymets/go-shorter/internal/shorter"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -18,7 +18,7 @@ var (
 	dbname   = os.Getenv("DB_POSTGRES_NAME")
 )
 
-func Conn() *gorm.DB {
+func Connection() *gorm.DB {
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	db, err := gorm.Open(postgres.Open(psqlInfo), &gorm.Config{})
 	if err != nil {

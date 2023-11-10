@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #73b0e9;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #bfe5a5;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            height: 192.078px;
+            text-align: center;
+            max-width: 620px;
+            width: 100%;
+        }
+        h3 {
+            font-size: 20px;
+        }
+        p {
+            font-weight: bold;
+            display: block;
+            margin: 10px;
+            color: rgb(110, 25, 25);
+        }
+        footer {
+            text-align: center;
+            padding: 5px;
+            position: absolute;
+            bottom: 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="shortened-link"></div>
+        <h3><a href="/go-shorter">Create another one</a></h3>
+            <br>
+            <br>
+            {{if .Error}}
+                <p>error: not valid url</p>
+            {{end}}     
+    </div>
+    <footer>
+        &copy; <span id="currentYear"></span> GO-SHORTER &#127482;&#127462;
+    </footer>
+</body>
+</html>

@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/sirupsen/logrus"
-	"github.com/yherasymets/go-shorter/pkg/api"
+	"github.com/yherasymets/go-shorter/internal/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -21,7 +21,7 @@ func main() {
 		logrus.Fatalf("failed to connect %v", err)
 	}
 
-	client := api.ClientApp{Conn: conn}
+	client := api.App{Conn: conn}
 	handler := client.Handler()
 
 	logrus.Info("starting client on port ", localPort)
