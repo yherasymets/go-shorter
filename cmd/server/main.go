@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/sirupsen/logrus"
-	"github.com/yherasymets/go-shorter/pkg/shorter"
+	"github.com/yherasymets/go-shorter/internal/shorter"
 	"github.com/yherasymets/go-shorter/proto"
 	"github.com/yherasymets/go-shorter/repo"
 	"google.golang.org/grpc"
@@ -20,8 +20,8 @@ func main() {
 		logrus.Errorf("failed to listen: %v", err)
 		return
 	}
-	db := repo.Conn()
-	cache := repo.RedisClient()
+	db := repo.Connection()
+	cache := repo.RedisCache()
 	defer cache.Close()
 	logrus.Infof("starting redis client: %v", cache.Ping(context.Background()).Val())
 
