@@ -2,6 +2,7 @@ package utils
 
 import (
 	"math/rand"
+	"regexp"
 
 	"github.com/asaskevich/govalidator"
 	"google.golang.org/grpc/codes"
@@ -10,6 +11,7 @@ import (
 
 const (
 	alphabet   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	pattern    = `^[a-zA-Z0-9]+$`
 	charNumber = 5
 )
 
@@ -29,4 +31,11 @@ func ValidateURL(url string) error {
 		return status.Error(codes.InvalidArgument, "invalid url")
 	}
 	return nil
+}
+
+func IsValidPath(path string) bool {
+	// Compile the regular expression.
+	re, err := regexp.Compile(pattern)
+	// Return true if the compilation is successful and the path matches the pattern.
+	return err == nil && re.MatchString(path)
 }
