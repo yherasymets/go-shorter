@@ -3,16 +3,14 @@ package api
 import (
 	"context"
 	"net/http"
-	"regexp"
 	"text/template"
 
-	"github.com/sirupsen/logrus"
 	"github.com/yherasymets/go-shorter/pkg/errors"
+	"github.com/yherasymets/go-shorter/pkg/utils"
 	"github.com/yherasymets/go-shorter/proto"
 	"google.golang.org/grpc"
 )
 
-// App struct
 type App struct {
 	Conn *grpc.ClientConn
 }
@@ -25,21 +23,18 @@ func (app *App) Handler() http.Handler {
 	return mux
 }
 
-// TODO: error handling, logging
-
+// create is an HTTP handler that create short URL
 func (app *App) create(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("web/index.html")
 	if err != nil {
-		logrus.Errorf("failed to parse template: %v", err)
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+		errors.TemplateError(w, err)
 		return
 	}
 	w.Header().Set("Content-Type", "text/html")
 	switch r.Method {
 	case http.MethodGet:
 		if err := t.ExecuteTemplate(w, "index.html", nil); err != nil {
-			logrus.Errorf("failed to execute template: %v", err)
-			http.Error(w, "internal server error", http.StatusInternalServerError)
+			errors.TemplateError(w, err)
 		}
 	case http.MethodPost:
 		http.Redirect(w, r, "/go-shorter/result", http.StatusPermanentRedirect)
@@ -57,21 +52,14 @@ func (app *App) get(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	// Define a regular expression pattern to match alphanumeric characters
-	pattern := `^[a-zA-Z0-9]+$`
-	re, err := regexp.Compile(pattern)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 	// Check if the path matches the pattern
-	if re.MatchString(path) {
+	if utils.IsValidPath(path) {
 		resp, err := service.Get(context.Background(), &proto.UrlRequest{FullURL: path})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, resp.Result, http.StatusMovedPermanently)
+		http.Redirect(w, r, resp.Result, http.StatusFound)
 		return
 	}
 	http.NotFound(w, r)
