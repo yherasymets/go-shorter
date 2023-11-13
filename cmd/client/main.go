@@ -21,7 +21,7 @@ func main() {
 		logrus.Fatalf("failed to connect %v", err)
 	}
 
-	client := api.App{Conn: conn}
+	client := api.NewApp(conn)
 	handler := client.Handler()
 
 	logrus.Info("starting client on port ", localPort)
