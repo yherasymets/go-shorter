@@ -15,6 +15,11 @@ type App struct {
 	Conn *grpc.ClientConn
 }
 
+func NewApp(conn *grpc.ClientConn) *App {
+	return &App{Conn: conn}
+}
+
+// Handler returns an HTTP handler that routes requests based on the path
 func (app *App) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", app.get)
