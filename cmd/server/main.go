@@ -15,11 +15,12 @@ import (
 var gRPCport = os.Getenv("GRPC_PORT")
 
 func main() {
-	l, err := net.Listen("tcp", gRPCport)
+	listener, err := net.Listen("tcp", gRPCport)
 	if err != nil {
 		logrus.Errorf("failed to listen: %v", err)
 		return
 	}
+
 	db := repo.Connection()
 	cache := repo.RedisCache()
 	defer cache.Close()
@@ -33,7 +34,7 @@ func main() {
 	proto.RegisterShorterServer(service, server)
 
 	logrus.Infof("starting gRPC listener on port " + gRPCport)
-	if err := service.Serve(l); err != nil {
+	if err := service.Serve(listener); err != nil {
 		logrus.Fatal(err)
 	}
 }
