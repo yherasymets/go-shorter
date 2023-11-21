@@ -93,10 +93,10 @@
                 window.getSelection().addRange(range);       
                 try {
                     var successful = document.execCommand('copy');
-                    var msg = successful ? 'Скопійовано!' : 'Помилка копіювання';
+                    var msg = successful ? 'Copied!' : 'Copy error';
                     console.log(msg);
                 } catch (err) {
-                    console.error('Помилка копіювання: ', err);
+                    console.error('Copy error: ', err);
                 }      
                 window.getSelection().removeAllRanges();
                 document.getElementById("button").innerText = "Copied!";
