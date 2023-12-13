@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	gRPCport  = os.Getenv("GRPC_PORT")
-	localPort = os.Getenv("PORT")
+	gRPCport = os.Getenv("GRPC_PORT")
+	port     = os.Getenv("PORT")
 )
 
 func main() {
@@ -24,8 +24,8 @@ func main() {
 	client := api.NewApp(conn)
 	handler := client.Handler()
 
-	logrus.Info("starting client on port ", localPort)
-	if err = http.ListenAndServe(localPort, handler); err != nil {
-		logrus.Fatalf("failed to connect %v: %v", localPort, err)
+	logrus.Info("starting client on port ", port)
+	if err = http.ListenAndServe(port, handler); err != nil {
+		logrus.Fatalf("failed to connect %v: %v", port, err)
 	}
 }

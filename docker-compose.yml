@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  app:
+    container_name: go-shorter-server
+    build: .
+    environment:
+      - GRPC_PORT=:8081
+      - HOST=psql_db
+      - DB_POSTGRES_PORT=5432
+      - DB_POSTGRES_USER=${DB_POSTGRES_USER}
+      - DB_POSTGRES_PASSWORD=${DB_POSTGRES_PASSWORD}
+      - DB_POSTGRES_NAME=${DB_POSTGRES_NAME} 
+      - DB_ADDR=redis_db:6379
+      - DB_PASS=
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgresql_db:
+        condition: service_healthy
+    links:
+      - postgresql_db    
+      - redis_db
+
+  postgresql_db:
+    restart: always 
+    container_name: psql_db
+    image: postgres:12
+    environment:
+      - DB_POSTGRES_USER=${DB_POSTGRES_USER}
+      - DB_POSTGRES_PASSWORD=${DB_POSTGRES_PASSWORD}
+      - DB_POSTGRES_NAME=${DB_POSTGRES_NAME} 
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis_db:
+    restart: always 
+    container_name: redis_db
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    volumes:
+      - cachedata:/var/lib/cachedata/data      
+
+volumes:  
+  pgdata: {}
+  cachedata: {}
