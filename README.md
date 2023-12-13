@@ -6,7 +6,7 @@ Inside `./proto` folder run command:
 
 ## Run PostgreSQL in docker container:
 
-`$ docker run --name postgres_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -d -p 8888:5432 postgres`
+`$ docker run --name postgres_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -d -p 5433:5432 postgres`
 
 ## Run Redis Server + Redis Insight in docker container:
 
