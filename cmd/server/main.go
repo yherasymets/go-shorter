@@ -33,7 +33,7 @@ func main() {
 	}
 	proto.RegisterShorterServer(service, server)
 
-	logrus.Infof("starting gRPC listener on port " + gRPCport)
+	logrus.Infof("starting gRPC listener on port %v", gRPCport)
 	if err := service.Serve(listener); err != nil {
 		logrus.Fatal(err)
 	}

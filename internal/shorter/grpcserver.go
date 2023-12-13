@@ -32,7 +32,6 @@ func (g *GRPCServer) Create(ctx context.Context, req *proto.UrlRequest) (*proto.
 	if err := utils.ValidateURL(req.FullURL); err != nil {
 		return nil, err
 	}
-
 	g.DB.Table("links").Where("full_link = ?", req.FullURL).Find(&link)
 	if req.FullURL == link.FullLink {
 		return &proto.UrlResponse{
@@ -40,12 +39,10 @@ func (g *GRPCServer) Create(ctx context.Context, req *proto.UrlRequest) (*proto.
 			Status: statusExist,
 		}, nil
 	}
-
 	link.FullLink = req.FullURL
 	link.Alias = alias
 	link.CreatedAt = time.Now()
 	g.DB.Create(&link)
-
 	return &proto.UrlResponse{
 		Result: fmt.Sprintf("localhost:8080/%s", link.Alias),
 		Status: statusSuccsess,
@@ -67,7 +64,7 @@ func (g *GRPCServer) Get(ctx context.Context, req *proto.UrlRequest) (*proto.Url
 		logrus.Info("retrive from DB")
 		err := g.Cache.Set(ctx, alias, link.FullLink, time.Hour).Err()
 		if err != nil {
-			logrus.Error(err)
+			return nil, err
 		}
 	}
 	return &proto.UrlResponse{
