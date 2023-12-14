@@ -3,7 +3,9 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;This pet-project is a backend application written in the Go programming language, use gRPC for efficient communication between client and service. The project use PostgreSQL as the primary database for persistent data storage and Redis as in-memory cache for faster access to frequently used information. Also a web client was created with a simple UI, using the stdlib.
 
-<h3>&nbsp;&nbsp;&nbsp;How to run application</h3>
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<h4>How to run application</h4>
 
 For start web-client locally use Makefile and execute commands bellow:
 
