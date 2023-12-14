@@ -1,13 +1,16 @@
-## How to generate proto file:
+<p align="center" ><img src="https://media.tenor.com/L7YcQoDk9dsAAAAi/cut-it-out-scissors.gif" height="50"/></p> 
+<h2 align="center">GO-SHORTER</h2>
 
-Inside `./proto` folder run command:
+&nbsp;&nbsp;&nbsp;&nbsp;This pet-project is a backend application written in the Go programming language, use gRPC for efficient communication between client and service. The project use PostgreSQL as the primary database for persistent data storage and Redis as in-memory cache for faster access to frequently used information. Also a web client was created with a simple UI, using the stdlib.
 
-`$ protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative *.proto`
+<h3>&nbsp;&nbsp;&nbsp;How to run application</h3>
 
-## Run PostgreSQL in docker container:
+For start web-client locally use Makefile and execute commands bellow:
 
-`$ docker run --name postgres_db -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -d -p 5433:5432 postgres`
+- set environment variables: `make set-env`
+- build client: `make build-client`
+- start client: `make run-client`
 
-## Run Redis Server + Redis Insight in docker container:
+For start server in Docker conteiner use docker-compose and Dockerfile:
 
-`$ docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest`
+- start go-shorter server, run command: `docker compose up` 

@@ -59,7 +59,7 @@ func (app *App) get(w http.ResponseWriter, r *http.Request) {
 	}
 	// Check if the path matches the pattern
 	if utils.IsValidPath(path) {
-		resp, err := service.Get(context.Background(), &proto.UrlRequest{FullURL: path})
+		resp, err := service.Get(context.Background(), &proto.GetRequest{ShortURL: path})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -78,7 +78,7 @@ func (app *App) result(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	service := proto.NewShorterClient(app.Conn)
-	res, err := service.Create(r.Context(), &proto.UrlRequest{
+	res, err := service.Create(r.Context(), &proto.CreateRequest{
 		FullURL: r.PostFormValue("original-link"),
 	})
 	if err != nil {

@@ -5,12 +5,16 @@ package proto;
 option go_package = "github.com/yherasymets/go-shorter/proto";
 
 service Shorter {
-    rpc Create(UrlRequest) returns (UrlResponse){}
-    rpc Get(UrlRequest) returns (UrlResponse){}
+    rpc Create(CreateRequest) returns (UrlResponse){}
+    rpc Get(GetRequest) returns (UrlResponse){}
 }
 
-message UrlRequest {
+message CreateRequest {
     string fullURL = 1;
+}
+
+message GetRequest {
+    string shortURL = 1;
 }
 
 message UrlResponse {

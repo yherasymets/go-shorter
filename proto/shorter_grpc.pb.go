@@ -27,8 +27,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ShorterClient interface {
-	Create(ctx context.Context, in *UrlRequest, opts ...grpc.CallOption) (*UrlResponse, error)
-	Get(ctx context.Context, in *UrlRequest, opts ...grpc.CallOption) (*UrlResponse, error)
+	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*UrlResponse, error)
+	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*UrlResponse, error)
 }
 
 type shorterClient struct {
@@ -39,7 +39,7 @@ func NewShorterClient(cc grpc.ClientConnInterface) ShorterClient {
 	return &shorterClient{cc}
 }
 
-func (c *shorterClient) Create(ctx context.Context, in *UrlRequest, opts ...grpc.CallOption) (*UrlResponse, error) {
+func (c *shorterClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*UrlResponse, error) {
 	out := new(UrlResponse)
 	err := c.cc.Invoke(ctx, Shorter_Create_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -48,7 +48,7 @@ func (c *shorterClient) Create(ctx context.Context, in *UrlRequest, opts ...grpc
 	return out, nil
 }
 
-func (c *shorterClient) Get(ctx context.Context, in *UrlRequest, opts ...grpc.CallOption) (*UrlResponse, error) {
+func (c *shorterClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*UrlResponse, error) {
 	out := new(UrlResponse)
 	err := c.cc.Invoke(ctx, Shorter_Get_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -61,8 +61,8 @@ func (c *shorterClient) Get(ctx context.Context, in *UrlRequest, opts ...grpc.Ca
 // All implementations must embed UnimplementedShorterServer
 // for forward compatibility
 type ShorterServer interface {
-	Create(context.Context, *UrlRequest) (*UrlResponse, error)
-	Get(context.Context, *UrlRequest) (*UrlResponse, error)
+	Create(context.Context, *CreateRequest) (*UrlResponse, error)
+	Get(context.Context, *GetRequest) (*UrlResponse, error)
 	mustEmbedUnimplementedShorterServer()
 }
 
@@ -70,10 +70,10 @@ type ShorterServer interface {
 type UnimplementedShorterServer struct {
 }
 
-func (UnimplementedShorterServer) Create(context.Context, *UrlRequest) (*UrlResponse, error) {
+func (UnimplementedShorterServer) Create(context.Context, *CreateRequest) (*UrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
-func (UnimplementedShorterServer) Get(context.Context, *UrlRequest) (*UrlResponse, error) {
+func (UnimplementedShorterServer) Get(context.Context, *GetRequest) (*UrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedShorterServer) mustEmbedUnimplementedShorterServer() {}
@@ -90,7 +90,7 @@ func RegisterShorterServer(s grpc.ServiceRegistrar, srv ShorterServer) {
 }
 
 func _Shorter_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UrlRequest)
+	in := new(CreateRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -102,13 +102,13 @@ func _Shorter_Create_Handler(srv interface{}, ctx context.Context, dec func(inte
 		FullMethod: Shorter_Create_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ShorterServer).Create(ctx, req.(*UrlRequest))
+		return srv.(ShorterServer).Create(ctx, req.(*CreateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Shorter_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UrlRequest)
+	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func _Shorter_Get_Handler(srv interface{}, ctx context.Context, dec func(interfa
 		FullMethod: Shorter_Get_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ShorterServer).Get(ctx, req.(*UrlRequest))
+		return srv.(ShorterServer).Get(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
