@@ -13,4 +13,8 @@ For start web-client locally use Makefile and execute commands bellow:
 
 For start server in Docker conteiner use docker-compose and Dockerfile:
 
-- start go-shorter server, run command: `docker compose up` 
+- start go-shorter server, run command: `docker compose up`
+
+<img src="https://github.com/yherasymets/go-shorter/blob/main/screenshots/Screenshot1.png" width="500">
+
+![screen-1](https://github.com/yherasymets/go-shorter/blob/main/screenshots/Screenshot1.png) 
