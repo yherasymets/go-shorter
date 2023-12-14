@@ -15,6 +15,9 @@ For start server in Docker conteiner use docker-compose and Dockerfile:
 
 - start go-shorter server, run command: `docker compose up`
 
-<img src="https://github.com/yherasymets/go-shorter/blob/main/screenshots/Screenshot1.png" width="500">
+Screenshots:
 
 ![screen-1](https://github.com/yherasymets/go-shorter/blob/main/screenshots/Screenshot1.png) 
+![screen-2](https://github.com/yherasymets/go-shorter/blob/main/screenshots/Screenshot2.png) 
+![screen-3](https://github.com/yherasymets/go-shorter/blob/main/screenshots/Screenshot3.png) 
+![screen-4](https://github.com/yherasymets/go-shorter/blob/main/screenshots/Screenshot4.png) 
