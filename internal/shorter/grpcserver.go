@@ -26,7 +26,7 @@ type GRPCServer struct {
 	Cache *redis.Client
 }
 
-func (g *GRPCServer) Create(ctx context.Context, req *proto.UrlRequest) (*proto.UrlResponse, error) {
+func (g *GRPCServer) Create(ctx context.Context, req *proto.CreateRequest) (*proto.UrlResponse, error) {
 	link := Link{}
 	alias := utils.Shorting()
 	if err := utils.ValidateURL(req.FullURL); err != nil {
@@ -49,12 +49,12 @@ func (g *GRPCServer) Create(ctx context.Context, req *proto.UrlRequest) (*proto.
 	}, nil
 }
 
-func (g *GRPCServer) Get(ctx context.Context, req *proto.UrlRequest) (*proto.UrlResponse, error) {
+func (g *GRPCServer) Get(ctx context.Context, req *proto.GetRequest) (*proto.UrlResponse, error) {
 	link := Link{}
-	if req.FullURL == "" {
+	if req.ShortURL == "" {
 		return nil, status.Error(codes.InvalidArgument, "url must be set")
 	}
-	alias := req.FullURL[len(req.FullURL)-charNumber:]
+	alias := req.ShortURL[len(req.ShortURL)-charNumber:]
 	res, err := g.Cache.Get(ctx, alias).Result()
 	if err == nil {
 		link.FullLink = res
