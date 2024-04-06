@@ -2,9 +2,9 @@ package repo
 
 import (
 	"fmt"
+	"log"
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/yherasymets/go-shorter/internal/shorter"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -25,7 +25,7 @@ func Connection() *gorm.DB {
 		panic("failed to connect database")
 	}
 	if err := db.AutoMigrate(shorter.Link{}); err != nil {
-		logrus.Errorf("migration failed: %v", err)
+		log.Printf("migration failed: %v", err)
 	}
 	return db
 }

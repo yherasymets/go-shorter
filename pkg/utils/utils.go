@@ -1,12 +1,11 @@
 package utils
 
 import (
+	"errors"
 	"math/rand"
 	"regexp"
 
 	"github.com/asaskevich/govalidator"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 const (
@@ -25,10 +24,10 @@ func Shorting() string {
 
 func ValidateURL(url string) error {
 	if url == "" {
-		return status.Error(codes.InvalidArgument, "empty url")
+		return errors.New("empty url")
 	}
 	if !govalidator.IsRequestURL(url) {
-		return status.Error(codes.InvalidArgument, "invalid url")
+		return errors.New("invalid url")
 	}
 	return nil
 }

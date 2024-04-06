@@ -12,11 +12,11 @@ import (
 )
 
 type App struct {
-	Conn *grpc.ClientConn
+	client *grpc.ClientConn
 }
 
-func NewApp(conn *grpc.ClientConn) *App {
-	return &App{Conn: conn}
+func NewApp(client *grpc.ClientConn) *App {
+	return &App{client: client}
 }
 
 // Handler returns an HTTP handler that routes requests based on the path
@@ -50,7 +50,7 @@ func (app *App) create(w http.ResponseWriter, r *http.Request) {
 
 // get is an HTTP handler that processes requests to retrieve and redirect to the original URL
 func (app *App) get(w http.ResponseWriter, r *http.Request) {
-	service := proto.NewShorterClient(app.Conn)
+	service := proto.NewShorterClient(app.client)
 	// Extract the part of the URL after the slash ("/")
 	path := r.URL.Path[1:]
 	if path == "" {
@@ -77,7 +77,7 @@ func (app *App) result(w http.ResponseWriter, r *http.Request) {
 		errors.TemplateError(w, err)
 		return
 	}
-	service := proto.NewShorterClient(app.Conn)
+	service := proto.NewShorterClient(app.client)
 	res, err := service.Create(r.Context(), &proto.CreateRequest{
 		FullURL: r.PostFormValue("original-link"),
 	})

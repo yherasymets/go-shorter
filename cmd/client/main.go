@@ -1,10 +1,10 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/yherasymets/go-shorter/internal/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -16,16 +16,16 @@ var (
 )
 
 func main() {
-	conn, err := grpc.Dial(gRPCport, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	clientGRPC, err := grpc.Dial(gRPCport, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logrus.Fatalf("failed to connect %v", err)
+		log.Fatalf("failed to connect %v", err)
 	}
 
-	client := api.NewApp(conn)
-	handler := client.Handler()
+	clientApp := api.NewApp(clientGRPC)
+	handler := clientApp.Handler()
 
-	logrus.Info("starting client on port ", port)
+	log.Printf("starting client on port %v", port)
 	if err = http.ListenAndServe(port, handler); err != nil {
-		logrus.Fatalf("failed to connect %v: %v", port, err)
+		log.Fatalf("failed to connect %v: %v", port, err)
 	}
 }
