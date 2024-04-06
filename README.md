@@ -7,15 +7,17 @@
 
 <h4>How to run application</h4>
 
-For start web-client locally use Makefile and execute commands bellow:
+For start web-client locally in project root directory execute commands bellow:
 
-- set environment variables: `make set-env`
+- set environment variables: `source .env`
 - build client: `make build-client`
+- build server: `make build-server`
 - start client: `make run-client`
+- start server: `make run-server`
 
 For start server in Docker conteiner use docker-compose and Dockerfile:
 
-- start go-shorter server, run command: `docker compose up`
+- start go-shorter server app, run command: `docker compose up`
 
 Screenshots:
 
