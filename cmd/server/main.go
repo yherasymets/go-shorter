@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
+	"log"
 	"net"
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/yherasymets/go-shorter/internal/shorter"
 	"github.com/yherasymets/go-shorter/proto"
 	"github.com/yherasymets/go-shorter/repo"
@@ -17,14 +17,13 @@ var gRPCport = os.Getenv("GRPC_PORT")
 func main() {
 	listener, err := net.Listen("tcp", gRPCport)
 	if err != nil {
-		logrus.Errorf("failed to listen: %v", err)
-		return
+		log.Fatalf("failed to listen: %v", err)
 	}
 
 	db := repo.Connection()
 	cache := repo.RedisCache()
 	defer cache.Close()
-	logrus.Infof("starting redis client: %v", cache.Ping(context.Background()).Val())
+	log.Printf("starting redis client: %v", cache.Ping(context.Background()).Val())
 
 	service := grpc.NewServer()
 	server := &shorter.GRPCServer{
@@ -33,8 +32,8 @@ func main() {
 	}
 	proto.RegisterShorterServer(service, server)
 
-	logrus.Infof("starting gRPC listener on port %v", gRPCport)
+	log.Printf("starting gRPC listener on port %v", gRPCport)
 	if err := service.Serve(listener); err != nil {
-		logrus.Fatal(err)
+		log.Fatal(err)
 	}
 }

@@ -27,9 +27,9 @@ services:
     container_name: psql_db
     image: postgres:12
     environment:
-      - DB_POSTGRES_USER=${DB_POSTGRES_USER}
-      - DB_POSTGRES_PASSWORD=${DB_POSTGRES_PASSWORD}
-      - DB_POSTGRES_NAME=${DB_POSTGRES_NAME} 
+      - POSTGRES_USER=${DB_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${DB_POSTGRES_PASSWORD}
+      - POSTGRES_NAME=${DB_POSTGRES_NAME} 
     ports:
       - "5433:5432"
     volumes:
