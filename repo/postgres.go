@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/yherasymets/go-shorter/internal/shorter"
+	"github.com/yherasymets/go-shorter/internal/service"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -18,13 +18,13 @@ var (
 	dbname   = os.Getenv("DB_POSTGRES_NAME")
 )
 
-func Connection() *gorm.DB {
+func NewRepository() *gorm.DB {
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	db, err := gorm.Open(postgres.Open(psqlInfo), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
-	if err := db.AutoMigrate(shorter.Link{}); err != nil {
+	if err := db.AutoMigrate(service.Link{}); err != nil {
 		log.Printf("migration failed: %v", err)
 	}
 	return db

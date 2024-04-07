@@ -11,7 +11,7 @@ var (
 	pass = os.Getenv("DB_PASS")
 )
 
-func RedisCache() *redis.Client {
+func NewCache() *redis.Client {
 	return redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: pass,

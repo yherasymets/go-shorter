@@ -1,4 +1,4 @@
-package shorter
+package service
 
 import (
 	"context"
@@ -24,6 +24,19 @@ type GRPCServer struct {
 	proto.UnimplementedShorterServer
 	DB    *gorm.DB
 	Cache *redis.Client
+}
+
+// type Service interface {
+// 	Create(ctx context.Context, req *proto.CreateRequest) (*proto.UrlResponse, error)
+// 	Get(ctx context.Context, req *proto.GetRequest) (*proto.UrlResponse, error)
+// }
+
+func NewService(db *gorm.DB, cache *redis.Client) *GRPCServer {
+	return &GRPCServer{
+		UnimplementedShorterServer: proto.UnimplementedShorterServer{},
+		DB:                         db,
+		Cache:                      cache,
+	}
 }
 
 func (s *GRPCServer) Create(ctx context.Context, req *proto.CreateRequest) (*proto.UrlResponse, error) {

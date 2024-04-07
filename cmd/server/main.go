@@ -6,7 +6,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/yherasymets/go-shorter/internal/shorter"
+	"github.com/yherasymets/go-shorter/internal/service"
 	"github.com/yherasymets/go-shorter/proto"
 	"github.com/yherasymets/go-shorter/repo"
 	"google.golang.org/grpc"
@@ -20,20 +20,17 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	db := repo.Connection()
-	cache := repo.RedisCache()
+	db := repo.NewRepository()
+	cache := repo.NewCache()
 	defer cache.Close()
 	log.Printf("starting redis client: %v", cache.Ping(context.Background()).Val())
 
-	service := grpc.NewServer()
-	server := &shorter.GRPCServer{
-		DB:    db,
-		Cache: cache,
-	}
-	proto.RegisterShorterServer(service, server)
+	gRPCserver := grpc.NewServer()
+	shorterService := service.NewService(db, cache)
+	proto.RegisterShorterServer(gRPCserver, shorterService)
 
 	log.Printf("starting gRPC listener on port %v", gRPCport)
-	if err := service.Serve(listener); err != nil {
+	if err := gRPCserver.Serve(listener); err != nil {
 		log.Fatal(err)
 	}
 }

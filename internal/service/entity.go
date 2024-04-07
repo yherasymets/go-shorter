@@ -1,4 +1,4 @@
-package shorter
+package service
 
 import "time"
 
