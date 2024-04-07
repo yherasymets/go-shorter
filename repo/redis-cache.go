@@ -6,11 +6,13 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+// Retrieve Redis connection parameters from environment variables.
 var (
-	addr = os.Getenv("DB_ADDR")
-	pass = os.Getenv("DB_PASS")
+	addr = os.Getenv("DB_ADDR") // Redis server address.
+	pass = os.Getenv("DB_PASS") // Redis server password (if any).
 )
 
+// NewCache creates a new Redis client instance.
 func NewCache() *redis.Client {
 	return redis.NewClient(&redis.Options{
 		Addr:     addr,

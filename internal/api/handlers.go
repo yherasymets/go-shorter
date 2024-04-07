@@ -11,10 +11,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+// App represents the application structure.
 type App struct {
 	client *grpc.ClientConn
 }
 
+// NewApp creates a new instance of App with the provided gRPC client connection.
 func NewApp(client *grpc.ClientConn) *App {
 	return &App{client: client}
 }

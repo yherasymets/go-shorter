@@ -2,7 +2,7 @@ package service
 
 import "time"
 
-// Link entity
+// Link entity struct.
 type Link struct {
 	FullLink  string    `gorm:"column:full_link"`
 	Alias     string    `gorm:"column:alias"`

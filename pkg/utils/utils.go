@@ -8,12 +8,14 @@ import (
 	"github.com/asaskevich/govalidator"
 )
 
+// Utils constants.
 const (
 	alphabet   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	pattern    = `^[a-zA-Z0-9]+$`
 	charNumber = 5
 )
 
+// Shorting generates a random string of characters.
 func Shorting() string {
 	alias := make([]byte, charNumber)
 	for i := range alias {
@@ -22,6 +24,7 @@ func Shorting() string {
 	return string(alias)
 }
 
+// ValidateURL validates the given URL string.
 func ValidateURL(url string) error {
 	if url == "" {
 		return errors.New("empty url")
@@ -32,6 +35,7 @@ func ValidateURL(url string) error {
 	return nil
 }
 
+// IsValidPath checks if the given path string matches the regular expression pattern.
 func IsValidPath(path string) bool {
 	// Compile the regular expression.
 	re, err := regexp.Compile(pattern)
