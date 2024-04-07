@@ -42,6 +42,7 @@ func (app *App) create(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		if err := t.ExecuteTemplate(w, "index.html", nil); err != nil {
 			errors.TemplateError(w, err)
+			return
 		}
 	case http.MethodPost:
 		http.Redirect(w, r, "/go-shorter/result", http.StatusPermanentRedirect)
@@ -89,5 +90,6 @@ func (app *App) result(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := t.ExecuteTemplate(w, "result.html", res); err != nil {
 		errors.TemplateError(w, err)
+		return
 	}
 }
